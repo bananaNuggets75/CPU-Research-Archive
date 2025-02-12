@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, signOut, User } from "firebase/auth";
-import app from "@/lib/firebase"; 
+import app from "@/lib/firebase";
 
 const Navbar = () => {
   const auth = getAuth(app);
@@ -26,22 +26,22 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-blue-600 p-4 text-white flex justify-between items-center">
-      <div>
-        <Link href="/" className="text-xl font-bold">Research Archive</Link>
+    <nav className="navbar">
+      <div className="navbar-brand">
+        <Link href="/">Research Archive</Link>
       </div>
-      <div className="space-x-4">
+      <div className="navbar-links">
         <Link href="/">Home</Link>
         <Link href="/library">Library</Link>
         {user && <Link href="/admin-dashboard">Admin Dashboard</Link>}
       </div>
-      <div>
+      <div className="navbar-actions">
         {user ? (
-          <button onClick={handleLogout} className="bg-red-500 px-4 py-2 rounded">
+          <button onClick={handleLogout} className="logout-btn">
             Logout
           </button>
         ) : (
-          <Link href="/login" className="bg-green-500 px-4 py-2 rounded">
+          <Link href="/login" className="login-btn">
             Login
           </Link>
         )}
