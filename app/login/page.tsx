@@ -13,14 +13,19 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
+  
     try {
       await loginAdmin(email, password);
-      router.push("/admin-dashboard"); // Redirect after successful login
-    } catch (err: any) {
-      setError(err.message);
+      router.push("/admin-dashboard");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
     }
   };
+  
 
   return (
     <div className="flex justify-center items-center min-h-screen">
