@@ -1,6 +1,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --hover-color: #3b82f6; /* Tailwind's text-blue-500 */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -35,6 +36,79 @@ a {
   text-decoration: none;
 }
 
+/* Navbar Styles */
+nav {
+  padding: 1rem 2rem;
+  background-color: var(--background);
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-links {
+  text-align: center;
+  flex: 1;
+}
+
+.navbar-links ul {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.navbar-links li {
+  display: inline;
+  margin: 0 20px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.navbar-links li:hover {
+  transform: scale(1.05);
+}
+
+.navbar-links a {
+  font-weight: 500;
+  color: var(--foreground);
+  transition: color 0.3s ease;
+  padding: 0.5rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.navbar-links a:hover {
+  color: var(--hover-color);
+  border-bottom: 2px solid var(--hover-color);
+}
+
+.right-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.right-nav .login-button {
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: var(--foreground);
+  background-color: transparent;
+  border: 2px solid var(--foreground);
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.right-nav .login-button:hover {
+  color: var(--background);
+  background-color: var(--hover-color);
+}
+
+/* Dark Mode */
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
