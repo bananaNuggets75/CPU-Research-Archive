@@ -11,6 +11,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [adminEmail, setAdminEmail] = useState("");
 
+  // the block that will run the login
   useEffect(() => {
     const checkAdmin = async () => {
       const user = auth.currentUser;
