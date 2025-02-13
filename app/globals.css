@@ -1,8 +1,7 @@
-/* General Styles */
 :root {
-  --background: #ffffff;
-  --foreground: #333333;
-  --hover-color: #0073e6;
+  --background: #000000; /* Black background */
+  --foreground: #ffffff; /* White text */
+  --hover-color: #0073e6; /* Blue hover effect */
 }
 
 body {
@@ -16,10 +15,11 @@ body {
 /* Navbar Styles */
 nav {
   background-color: var(--background);
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 4px rgba(255, 255, 255, 0.1);
   position: sticky;
   top: 0;
   z-index: 50;
+  padding: 1rem 0;
 }
 
 /* Navbar container */
@@ -28,7 +28,7 @@ nav .max-w-7xl {
   justify-content: space-between;
   align-items: center;
   height: 4rem;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
   max-width: 1280px;
   margin: 0 auto;
 }
@@ -47,15 +47,17 @@ nav .text-2xl a:hover {
 
 /* Navigation Links */
 nav ul {
-  width: 100%;
   list-style: none;
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
 }
 
 nav li {
-  height: 50px;
+  height: 100%;
 }
 
 .nav-link {
@@ -77,24 +79,30 @@ nav li {
 }
 
 /* Buttons (Login & Logout) */
-nav button,
-nav a.bg-blue-500,
-nav a.bg-red-500 {
+nav .btn {
   font-size: 1rem;
   font-weight: bold;
   color: white;
-  padding: 0.5rem 1.2rem;
+  padding: 0.6rem 1.5rem;
   border-radius: 8px;
   text-decoration: none;
   transition: background 0.3s ease;
 }
 
-nav a.bg-blue-500:hover {
+nav .btn-primary {
+  background-color: #0073e6;
+}
+
+nav .btn-primary:hover {
   background-color: #005bb5;
 }
 
-nav a.bg-red-500:hover {
+nav .btn-danger {
   background-color: #b52d2d;
+}
+
+nav .btn-danger:hover {
+  background-color: #8f1d1d;
 }
 
 /* Responsive Navbar */
@@ -121,5 +129,11 @@ nav a.bg-red-500:hover {
     width: 100%;
     text-align: center;
     padding: 1rem;
+  }
+
+  .btn {
+    display: block;
+    text-align: center;
+    width: 100%;
   }
 }
