@@ -16,17 +16,21 @@ interface Paper {
     );
   
     return (
-      <div className="paper-list">
+      <div className="container">
         {filteredPapers.length > 0 ? (
-          filteredPapers.map((paper) => (
-            <div key={paper.id} className="paper-item">
-              <h3>{paper.title}</h3>
-              <p>{paper.author} - {paper.category}</p>
-            </div>
-          ))
+          <div className="paper-grid">
+            {filteredPapers.map((paper) => (
+              <div key={paper.id} className="paper-card">
+                <h3>{paper.title}</h3>
+                <p className="paper-author">{paper.author}</p>
+                <span className="paper-category">{paper.category}</span>
+              </div>
+            ))}
+          </div>
         ) : (
-          <p>No research papers found.</p>
+          <p className="no-results">No research papers found.</p>
         )}
       </div>
     );
   }
+  

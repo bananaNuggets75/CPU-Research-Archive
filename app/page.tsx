@@ -1,29 +1,56 @@
-import Image from "next/image";
-import Link from "next/link";
-import styles from "./page.module.css";
+"use client";
+import { useState, useEffect } from "react";
+import SearchBar from "@/components/SearchBar";
+import PaperList from "@/components/PaperList";
+import { getDatabase, ref, onValue } from "firebase/database";
+import firebase from "@/lib/firebase";
 
-export default function Home() {
+// Define the Paper type
+interface Paper {
+  id: string;
+  title: string;
+  author: string;
+  category: string;
+  [key: string]: any;
+}
+
+export default function Dashboard() {
+  const [papers, setPapers] = useState<Paper[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const db = getDatabase(firebase);
+    const papersRef = ref(db, "papers");
+    onValue(papersRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const paperArray: Paper[] = Object.keys(data).map((key) => ({
+          id: key,
+          title: data[key].title || "Untitled",
+          author: data[key].author || "Unknown",
+          category: data[key].category || "Uncategorized",
+          ...data[key],
+        }));
+        setPapers(paperArray);
+      }
+    });
+  }, []);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <h1 className={styles.title}>CPU Research Archiving System</h1>
-        <p className={styles.subtitle}>
-          A digital repository for research papers at CPU.
-        </p>
+    <div className="container">
+      {/* Search Bar */}
+      <input
+        type="text"
+        placeholder="Search for research papers..."
+        className="search-bar"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
 
-        <div className={styles.actions}>
-          <Link href="/dashboard" className={styles.primaryBtn}>
-            Explore Research
-          </Link>
-          <Link href="/login" className={styles.secondaryBtn}>
-            Admin Login
-          </Link>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <p>© {new Date().getFullYear()} CPU Research Archiving</p>
-      </footer>
+      {/* Paper List */}
+      <div className="paper-grid">
+        <PaperList papers={papers} searchQuery={searchQuery} />
+      </div>
     </div>
   );
 }

@@ -156,3 +156,92 @@ nav .btn-danger:hover {
     width: 100%;
   }
 }
+
+/* ============= ADDED STYLES BELOW ============= */
+
+/* General container styling */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Full-width search bar */
+.search-bar {
+  width: 100%;
+  max-width: 800px;
+  margin: 1.5rem auto;
+  padding: 1rem;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--foreground);
+  border: none;
+  font-size: 1rem;
+  outline: none;
+  transition: background 0.3s ease;
+}
+
+.search-bar::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.search-bar:focus {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Paper List Grid */
+.paper-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Paper Card */
+.paper-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  border-radius: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+}
+
+.paper-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(255, 255, 255, 0.2);
+}
+
+/* Paper Title */
+.paper-card h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+}
+
+/* Paper Author */
+.paper-author {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Paper Category */
+.paper-category {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: white;
+  background-color: var(--hover-color);
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+}
+
+/* No results message */
+.no-results {
+  text-align: center;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 2rem;
+}
