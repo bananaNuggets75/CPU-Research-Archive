@@ -37,9 +37,20 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div>
-      <SearchBar onSearch={setSearchQuery} />
-      <PaperList papers={papers} searchQuery={searchQuery} />
+    <div className="container">
+      {/* Search Bar */}
+      <input
+        type="text"
+        placeholder="Search for research papers..."
+        className="search-bar"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+
+      {/* Paper List */}
+      <div className="paper-grid">
+        <PaperList papers={papers} searchQuery={searchQuery} />
+      </div>
     </div>
   );
 }
