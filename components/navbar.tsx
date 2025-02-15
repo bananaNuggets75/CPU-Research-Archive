@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -29,7 +30,13 @@ const Navbar = () => {
         {/* Left: Brand */}
         <div className="logo">
           <Link href="/" className="text-2xl font-bold text-white">
-            Research Archive
+          <Image
+            src="/cpu-logo.png" 
+            alt="SafeDrive Logo"
+            width={40}
+            height={40}
+            className="mr-2" 
+          />
           </Link>
         </div>
 

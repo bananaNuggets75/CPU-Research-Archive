@@ -20,7 +20,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         placeholder="Search research papers..."
         value={query}
         onChange={handleChange}
-        className="search-input"
+        className="search-bar"
       />
     </div>
   );
