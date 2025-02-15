@@ -1,11 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import SearchBar from "@/components/SearchBar";
 import PaperList from "@/components/PaperList";
-import { getDatabase, ref, onValue } from "firebase/database";
+import { getDatabase, ref, onValue, off } from "firebase/database";
 import firebase from "@/lib/firebase";
 
-// Define the Paper type
 interface Paper {
   id: string;
   title: string;
@@ -21,7 +20,8 @@ export default function Dashboard() {
   useEffect(() => {
     const db = getDatabase(firebase);
     const papersRef = ref(db, "papers");
-    onValue(papersRef, (snapshot) => {
+
+    const unsubscribe = onValue(papersRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
         const paperArray: Paper[] = Object.keys(data).map((key) => ({
@@ -34,22 +34,28 @@ export default function Dashboard() {
         setPapers(paperArray);
       }
     });
+
+    return () => {
+      off(papersRef); // Clean up Firebase listener on unmount
+    };
+  }, []);
+
+  // Memoized filtered papers for performance optimization
+  const filteredPapers = useMemo(() => {
+    return papers.filter((paper) =>
+      paper.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [papers, searchQuery]);
+
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
   }, []);
 
   return (
     <div className="container">
-      {/* Search Bar */}
-      <input
-        type="text"
-        placeholder="Search for research papers..."
-        className="search-bar"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-
-      {/* Paper List */}
+      <SearchBar onSearch={handleSearch} />
       <div className="paper-grid">
-        <PaperList papers={papers} searchQuery={searchQuery} />
+        <PaperList papers={filteredPapers} />
       </div>
     </div>
   );
