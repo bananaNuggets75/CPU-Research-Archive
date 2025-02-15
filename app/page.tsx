@@ -36,11 +36,11 @@ export default function Dashboard() {
     });
 
     return () => {
-      off(papersRef); // Clean up Firebase listener on unmount
+      off(papersRef);
     };
   }, []);
 
-  // Memoized filtered papers for performance optimization
+  // Apply filtering logic inside Dashboard.tsx
   const filteredPapers = useMemo(() => {
     return papers.filter((paper) =>
       paper.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -55,7 +55,7 @@ export default function Dashboard() {
     <div className="container">
       <SearchBar onSearch={handleSearch} />
       <div className="paper-grid">
-        <PaperList papers={filteredPapers} />
+        <PaperList papers={filteredPapers} /> {/* ✅ FIXED */}
       </div>
     </div>
   );
