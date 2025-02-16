@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginAdmin } from "@/lib/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -10,20 +12,48 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
+    const auth = getAuth();
+
     try {
-      await loginAdmin(email, password);
-      router.push("/admin-dashboard");
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Fetch user role from Firestore
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+
+      if (userDoc.exists()) {
+        const role = userDoc.data().role;
+
+        if (isAdmin && role === "admin") {
+          router.push("/admin-dashboard");
+        } else if (!isAdmin && role === "user") {
+          router.push("/home");
+        } else {
+          setError("You do not have the required privileges.");
+        }
       } else {
-        setError("An unexpected error occurred.");
+        setError("No user data found.");
+      }
+    } catch (err: any) {
+      switch (err.code) {
+        case "auth/user-not-found":
+          setError("No account found with this email.");
+          break;
+        case "auth/wrong-password":
+          setError("Incorrect password. Please try again.");
+          break;
+        case "auth/too-many-requests":
+          setError("Too many failed attempts. Please try again later.");
+          break;
+        default:
+          setError("An unexpected error occurred. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -35,12 +65,35 @@ export default function LoginPage() {
       <form 
         onSubmit={handleLogin} 
         className="p-6 bg-white shadow-md rounded-md w-80"
-        aria-labelledby="admin-login-form"
+        aria-labelledby="login-form"
       >
-        <h2 id="admin-login-form" className="text-lg font-semibold mb-4 text-center">
-          Admin Login
+        <h2 id="login-form" className="text-lg font-semibold mb-4 text-center">
+          {isAdmin ? "Admin Login" : "Student Login"}
         </h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+
+        {error && (
+          <p className="text-red-500 mb-4" role="alert" aria-live="assertive">
+            {error}
+          </p>
+        )}
+
+        <div className="mb-4">
+          <button 
+            type="button" 
+            onClick={() => setIsAdmin(false)}
+            className={`w-1/2 p-2 rounded-l ${!isAdmin ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          >
+            Student
+          </button>
+          <button 
+            type="button" 
+            onClick={() => setIsAdmin(true)}
+            className={`w-1/2 p-2 rounded-r ${isAdmin ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          >
+            Admin
+          </button>
+        </div>
+
         <input
           type="email"
           placeholder="Email"
