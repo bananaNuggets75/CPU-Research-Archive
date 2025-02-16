@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -7,17 +7,20 @@ interface SearchBarProps {
 export default function SearchBar({ onSearch }: SearchBarProps) {
   const [query, setQuery] = useState("");
 
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+    onSearch(value);
+  }, [onSearch]);
+
   return (
-    <div className="w-full max-w-lg mx-auto p-4">
+    <div className="search-container">
       <input
         type="text"
         placeholder="Search research papers..."
         value={query}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          onSearch(e.target.value);
-        }}
-        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        onChange={handleChange}
+        className="search-bar"
       />
     </div>
   );
