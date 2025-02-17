@@ -2,41 +2,52 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth, database } from "@/lib/firebase";
-import { ref, get } from "firebase/database";
-import { signOut } from "firebase/auth";
+import { getAuth, signOut, User } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+import app from "@/lib/firebase";
 
-const UploadForm = () => {
+const AdminDashboard = () => {
+  const auth = getAuth(app);
+  const db = getFirestore(app);
   const router = useRouter();
+
+  const [user, setUser] = useState<User | null>(null);
+  const [adminEmail, setAdminEmail] = useState("");
+  const [loading, setLoading] = useState(true);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [url, setUrl] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [adminEmail, setAdminEmail] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const checkAdmin = async () => {
-      const user = auth.currentUser;
-      if (!user) {
+      const currentUser = auth.currentUser;
+
+      if (!currentUser) {
         router.push("/login");
         return;
       }
 
-      const adminRef = ref(database, `admins/${user.uid}`);
-      const adminSnapshot = await get(adminRef);
+      try {
+        const userRef = doc(db, "users", currentUser.uid);
+        const userSnap = await getDoc(userRef);
 
-      if (!adminSnapshot.exists()) {
-        await signOut(auth);
-        router.push("/login");
-      } else {
-        setAdminEmail(user.email || "Admin");
+        if (!userSnap.exists() || userSnap.data().role !== "admin") {
+          await signOut(auth);
+          router.push("/login");
+        } else {
+          setUser(currentUser);
+          setAdminEmail(currentUser.email || "Admin");
+        }
+      } catch (err) {
+        setError("Failed to verify admin status.");
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
     checkAdmin();
-  }, [router]);
+  }, [db, router, auth]);
 
   if (loading) return <p className="text-white text-center">Loading...</p>;
 
@@ -51,20 +62,28 @@ const UploadForm = () => {
     if (!file) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
+    setError("");
 
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    const data = await res.json();
-    if (data.url) {
-      setUrl(data.url);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Failed to upload file.");
+
+      const data = await res.json();
+      if (data.url) {
+        setUrl(data.url);
+      }
+    } catch (err) {
+      setError("File upload failed.");
+    } finally {
+      setUploading(false);
     }
-
-    setUploading(false);
   };
 
   return (
@@ -82,7 +101,6 @@ const UploadForm = () => {
           Logout
         </button>
 
-        {/* File Upload Form */}
         <form onSubmit={handleUpload} className="space-y-4">
           <label className="block text-lg font-medium">
             Select a PDF to Upload:
@@ -94,20 +112,20 @@ const UploadForm = () => {
             />
           </label>
 
-          {/* PDF Preview */}
           {file && (
             <div className="mt-4 p-4 bg-gray-800 rounded-lg">
               <h2 className="text-lg font-semibold">File Preview:</h2>
               <p className="text-gray-400">Name: {file.name}</p>
               <p className="text-gray-400">Size: {(file.size / 1024 / 1024).toFixed(2)} MB</p>
               <iframe
+                title="PDF Preview"
                 src={URL.createObjectURL(file)}
                 className="mt-2 w-full h-64 border rounded"
-              />
+              ></iframe>
+
             </div>
           )}
 
-          {/* Upload Button */}
           <button
             type="submit"
             disabled={uploading}
@@ -117,18 +135,19 @@ const UploadForm = () => {
           </button>
         </form>
 
-        {/* Uploaded File Link */}
-        {url && (
-          <div className="mt-4 text-center">
-            <p>Uploaded PDF:</p>
-            <a href={url} target="_blank" className="text-blue-400 underline">
-              View File
+        {error && <p className="text-red-500 mt-4">{error}</p>}
+
+        {url && file && (
+        <div className="mt-4 text-center">
+          <p>Uploaded PDF:</p>
+          <a href={url} target="_blank" className="text-blue-400 underline">
+            {file.name.replace(/\.pdf$/, "")}
             </a>
-          </div>
-        )}
+            </div>
+            )}
       </div>
     </div>
   );
 };
 
-export default UploadForm;
+export default AdminDashboard;
