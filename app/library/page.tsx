@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
-import  app  from "@/lib/firebase";
+import app from "@/lib/firebase";
 
 interface Paper {
   id: string;
@@ -16,19 +16,27 @@ interface Paper {
 const PublicLibrary = () => {
   const [papers, setPapers] = useState<Paper[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const categoryFilter = searchParams.get("category");
   const db = getFirestore(app);
+
+  useEffect(() => {
+    // Get the category from the URL manually
+    const params = new URLSearchParams(window.location.search);
+    setCategoryFilter(params.get("category"));
+  }, []);
 
   useEffect(() => {
     const fetchPapers = async () => {
       const papersCollection = collection(db, "research_papers");
       const papersSnapshot = await getDocs(papersCollection);
-      const papersList: Paper[] = papersSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      } as Paper));
+      const papersList: Paper[] = papersSnapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          } as Paper)
+      );
       setPapers(papersList);
     };
     fetchPapers();
@@ -38,7 +46,9 @@ const PublicLibrary = () => {
     .filter((paper) =>
       paper.title.toLowerCase().includes(searchQuery.toLowerCase())
     )
-    .filter((paper) => (categoryFilter ? paper.category === categoryFilter : true));
+    .filter((paper) =>
+      categoryFilter ? paper.category === categoryFilter : true
+    );
 
   const handlePaperClick = (paperId: string) => {
     router.push(`/login`);
@@ -76,4 +86,12 @@ const PublicLibrary = () => {
   );
 };
 
-export default PublicLibrary;
+const LibraryPage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PublicLibrary />
+    </Suspense>
+  );
+};
+
+export default LibraryPage;
