@@ -137,14 +137,14 @@ const AdminDashboard = () => {
 
         {error && <p className="text-red-500 mt-4">{error}</p>}
 
-        {url && (
-          <div className="mt-4 text-center">
-            <p>Uploaded PDF:</p>
-            <a href={url} target="_blank" className="text-blue-400 underline">
-              View File
+        {url && file && (
+        <div className="mt-4 text-center">
+          <p>Uploaded PDF:</p>
+          <a href={url} target="_blank" className="text-blue-400 underline">
+            {file.name.replace(/\.pdf$/, "")}
             </a>
-          </div>
-        )}
+            </div>
+            )}
       </div>
     </div>
   );
