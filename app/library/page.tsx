@@ -1,97 +1,44 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
-import app from "@/lib/firebase";
+import axios from "axios";
 
-interface Paper {
-  id: string;
-  title: string;
-  author: string;
-  category: string;
+interface PDF {
+  public_id: string;
+  url: string;
 }
 
-const PublicLibrary = () => {
-  const [papers, setPapers] = useState<Paper[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-  const router = useRouter();
-  const db = getFirestore(app);
+const Library = () => {
+  const [pdfs, setPdfs] = useState<PDF[]>([]);
 
   useEffect(() => {
-    // Get the category from the URL manually
-    const params = new URLSearchParams(window.location.search);
-    setCategoryFilter(params.get("category"));
+    const fetchPdfs = async () => {
+      try {
+        const response = await axios.get("/api/getPdfs");
+        setPdfs(response.data);
+      } catch (error) {
+        console.error("Failed to fetch PDFs:", error);
+      }
+    };
+
+    fetchPdfs();
   }, []);
 
-  useEffect(() => {
-    const fetchPapers = async () => {
-      const papersCollection = collection(db, "research_papers");
-      const papersSnapshot = await getDocs(papersCollection);
-      const papersList: Paper[] = papersSnapshot.docs.map(
-        (doc) =>
-          ({
-            id: doc.id,
-            ...doc.data(),
-          } as Paper)
-      );
-      setPapers(papersList);
-    };
-    fetchPapers();
-  }, [db]);
-
-  const filteredPapers = papers
-    .filter((paper) =>
-      paper.title.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .filter((paper) =>
-      categoryFilter ? paper.category === categoryFilter : true
-    );
-
-  const handlePaperClick = (paperId: string) => {
-    router.push(`/login`);
-  };
-
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <h1 className="text-3xl font-bold text-center mb-6">Public Library</h1>
-      <div className="max-w-4xl mx-auto">
-        <input
-          type="text"
-          placeholder="Search research papers..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="search-bar w-full p-2 mb-4 text-black rounded"
-        />
-        {filteredPapers.length > 0 ? (
-          <ul className="space-y-4 mt-4">
-            {filteredPapers.map((paper) => (
-              <li key={paper.id} className="bg-gray-800 p-4 rounded-lg shadow">
-                <button
-                  onClick={() => handlePaperClick(paper.id)}
-                  className="text-blue-400 hover:underline"
-                >
-                  {paper.title} - {paper.author}
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-center">No research papers found.</p>
-        )}
-      </div>
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-3xl font-bold mb-4">Library</h1>
+      <ul className="list-disc pl-5 space-y-2">
+        {pdfs.map((pdf) => (
+          <li key={pdf.public_id}>
+            <Link href={pdf.url} target="_blank" rel="noopener noreferrer">
+              {pdf.public_id}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
 
-const LibraryPage = () => {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <PublicLibrary />
-    </Suspense>
-  );
-};
-
-export default LibraryPage;
+export default Library;
