@@ -1,97 +1,78 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import app from "@/lib/firebase";
 
-interface Paper {
-  id: string;
-  title: string;
-  author: string;
-  category: string;
-}
-
-const PublicLibrary = () => {
-  const [papers, setPapers] = useState<Paper[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-  const router = useRouter();
+export default function LibraryPage() {
   const db = getFirestore(app);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [papers, setPapers] = useState<{ id: string; title: string; authors: string; url: string }[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get the category from the URL manually
-    const params = new URLSearchParams(window.location.search);
-    setCategoryFilter(params.get("category"));
-  }, []);
-
-  useEffect(() => {
-    const fetchPapers = async () => {
-      const papersCollection = collection(db, "research_papers");
-      const papersSnapshot = await getDocs(papersCollection);
-      const papersList: Paper[] = papersSnapshot.docs.map(
-        (doc) =>
-          ({
-            id: doc.id,
-            ...doc.data(),
-          } as Paper)
-      );
-      setPapers(papersList);
-    };
+    async function fetchPapers() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "papers"));
+        const papersList = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setPapers(papersList as { id: string; title: string; authors: string; url: string }[]);
+      } catch (error) {
+        console.error("Error fetching papers:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
     fetchPapers();
   }, [db]);
 
-  const filteredPapers = papers
-    .filter((paper) =>
-      paper.title.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .filter((paper) =>
-      categoryFilter ? paper.category === categoryFilter : true
-    );
-
-  const handlePaperClick = (paperId: string) => {
-    router.push(`/login`);
-  };
+  const filteredPapers = papers.filter(
+    (paper) =>
+      paper.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      paper.authors.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <h1 className="text-3xl font-bold text-center mb-6">Public Library</h1>
-      <div className="max-w-4xl mx-auto">
-        <input
-          type="text"
-          placeholder="Search research papers..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="search-bar w-full p-2 mb-4 text-black rounded"
-        />
-        {filteredPapers.length > 0 ? (
-          <ul className="space-y-4 mt-4">
-            {filteredPapers.map((paper) => (
-              <li key={paper.id} className="bg-gray-800 p-4 rounded-lg shadow">
-                <button
-                  onClick={() => handlePaperClick(paper.id)}
-                  className="text-blue-400 hover:underline"
-                >
-                  {paper.title} - {paper.author}
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-center">No research papers found.</p>
-        )}
-      </div>
+    <div className="container mx-auto p-6 text-white">
+      <h1 className="text-2xl font-bold mb-4">Library</h1>
+      <input
+        type="text"
+        placeholder="Search papers..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="w-full p-2 mb-4 rounded bg-gray-800 text-white border border-gray-600"
+      />
+      {loading ? (
+        <p className="text-center text-gray-400">Loading papers...</p>
+      ) : (
+        <table className="w-full border-collapse border border-gray-700">
+          <thead>
+            <tr className="bg-gray-800 text-left">
+              <th className="p-2 border border-gray-700">Title</th>
+              <th className="p-2 border border-gray-700">Authors</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredPapers.length > 0 ? (
+              filteredPapers.map((paper) => (
+                <tr key={paper.id} className="border border-gray-700">
+                  <td className="p-2 border border-gray-700">
+                    <a href={paper.url} className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
+                      {paper.title}
+                    </a>
+                  </td>
+                  <td className="p-2 border border-gray-700">{paper.authors}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={2} className="p-4 text-center text-gray-400">
+                  No papers found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      )}
     </div>
   );
-};
-
-const LibraryPage = () => {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <PublicLibrary />
-    </Suspense>
-  );
-};
-
-export default LibraryPage;
+}
