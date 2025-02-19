@@ -7,53 +7,53 @@ const researchTopics = [
   { 
     id: 1, 
     title: "Neural Networks", 
-    image: "/images/neural_networks.jpg", 
+    image: "/cat5.jpg", 
     designer: "David Borg",
-    papers: 2342,
-    views: 4738,
+    papers: 8,
+    views: 35,
     ranking: 1
   },
   { 
     id: 2, 
     title: "Quantum Computing", 
-    image: "/images/quantum_computing.jpg", 
+    image: "/cat4.jpg", 
     designer: "Lucy",
-    papers: 1500,
-    views: 3200,
+    papers: 7,
+    views: 28,
     ranking: 2
   },
   { 
     id: 3, 
     title: "AI Ethics", 
-    image: "/images/ai_ethics.jpg", 
+    image: "/cat3.jpg", 
     designer: "Jerry Cool West",
-    papers: 1800,
-    views: 2800,
+    papers: 6,
+    views: 23,
     ranking: 3
   },
   { 
     id: 4, 
     title: "Cybersecurity", 
-    image: "/images/cybersecurity.jpg", 
+    image: "/cat2.jpg", 
     designer: "Bold",
-    papers: 2000,
-    views: 2500,
+    papers: 4,
+    views: 18,
     ranking: 4
   },
     { 
     id: 5, 
     title: "Blockchain Technology", 
-    image: "/images/blockchain.jpg", 
+    image: "/cat1.jpg", 
     designer: "David Borg",
-    papers: 1200,
-    views: 2000,
+    papers: 2,
+    views: 15,
     ranking: 5
   }
 ];
 
 export default function Dashboard() {
   return (
-    <div className="container mx-auto p-6 text-white bg-gradient-to-r from-indigo-900 via-purple-900 to-black">
+    <div className="dashboard-container mx-auto p-6 text-white bg-gradient-to-r from-indigo-900 via-purple-900 to-black">
       <h1 className="text-3xl font-bold mb-4 text-center">Welcome to CPU Research Archive</h1>
       <p className="text-gray-400 mb-6 text-center">Browse research papers. Sign in for full access.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
