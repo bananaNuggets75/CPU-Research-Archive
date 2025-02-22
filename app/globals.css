@@ -10,13 +10,13 @@
 }
 
 body {
-  font-family: "Inter", sans-serif;
   margin: 0;
   padding: 0;
   background: linear-gradient(to bottom right, #111827, #000000);
   background-color: var(--background);
-  color: var(--text-color-primary);
   padding-right: 200px;
+  font-family: sans-serif; /* Choose a suitable font */
+  color: #333; /* Dark text color for contrast */
 }
 
 /* Navbar Styles */
@@ -636,4 +636,5 @@ td a {
 td a:hover {
   text-decoration: underline;
 }
+
 
