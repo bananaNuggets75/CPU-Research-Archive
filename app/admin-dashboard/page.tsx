@@ -50,7 +50,7 @@ const AdminDashboard = () => {
     try {
       const querySnapshot = await getDocs(collection(db, "papers"));
       const papersList = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setPapers(papersList as { id: string; title: string; url: string }[]);
+      setPapers(papersList.sort((a, b) => b.id.localeCompare(a.id)) as { id: string; title: string; url: string }[]);
     } catch (err) {
       setError("Failed to fetch papers.");
     }
