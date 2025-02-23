@@ -15,11 +15,10 @@ const AdminDashboard = () => {
   const [adminEmail, setAdminEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const [file, setFile] = useState<File | null>(null);
-  const [title, setTitle] = useState("");
-  const [authors, setAuthors] = useState("");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
-  const [papers, setPapers] = useState<{ id: string; title: string; authors: string; url: string }[]>([]);
+  const [papers, setPapers] = useState<{ id: string; title: string; url: string; size: number }[]>([]);
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -52,7 +51,7 @@ const AdminDashboard = () => {
     try {
       const querySnapshot = await getDocs(collection(db, "papers"));
       const papersList = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setPapers(papersList as { id: string; title: string; authors: string; url: string }[]);
+      setPapers(papersList as { id: string; title: string; url: string; size: number }[]);
     } catch (err) {
       setError("Failed to fetch papers.");
     }
@@ -66,8 +65,8 @@ const AdminDashboard = () => {
 
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!file || !title || !authors) {
-      setError("Please provide a title, authors, and a PDF file.");
+    if (!file) {
+      setError("Please select a PDF file.");
       return;
     }
     setUploading(true);
@@ -80,7 +79,8 @@ const AdminDashboard = () => {
       if (!res.ok) throw new Error("Failed to upload file.");
       const data = await res.json();
       if (data.url) {
-        await setDoc(doc(db, "papers", file.name), { title, authors, url: data.url });
+        const title = file.name.replace(/\.pdf$/, "");
+        await setDoc(doc(db, "papers", file.name), { title, url: data.url, size: file.size });
         fetchPapers();
       }
     } catch (err) {
@@ -99,43 +99,92 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleSort = (key: keyof typeof papers[number]) => {
+    let direction: "asc" | "desc" = "asc";
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  
+    setPapers((prevPapers) =>
+      [...prevPapers].sort((a, b) => {
+        const aValue = a[key];
+        const bValue = b[key];
+  
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return direction === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        }
+        
+        if (typeof aValue === "number" && typeof bValue === "number") {
+          return direction === "asc" ? aValue - bValue : bValue - aValue;
+        }
+  
+        return 0;
+      })
+    );
+  };
+  
+
   if (loading) return <p className="loading-text">Loading...</p>;
 
   return (
-    <div className="admin-dashboard">
-      <div className="admin-container">
-        <h1 className="admin-title">Welcome, {adminEmail}</h1>
-        <button onClick={() => signOut(auth).then(() => router.push("/login"))} className="logout-button">Logout</button>
-        <form onSubmit={handleUpload} className="upload-form">
-          <label className="form-label">Title:
-            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="form-input" />
+    <div className="admin-dashboard bg-gray-100 min-h-screen">
+      <div className="admin-container max-w-7xl mx-auto p-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="admin-title text-2xl font-bold text-gray-800">Welcome, {adminEmail}</h1>
+          <button onClick={() => signOut(auth).then(() => router.push("/login"))} className="logout-button bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+            Logout
+          </button>
+        </div>
+
+        <form onSubmit={handleUpload} className="upload-form bg-white p-6 rounded-lg shadow">
+          <label className="form-label block text-gray-700 font-bold mb-2">
+            Select a PDF to Upload:
+            <input type="file" accept="application/pdf" onChange={handleFileChange} className="file-input w-full" />
           </label>
-          <label className="form-label">Authors:
-            <input type="text" value={authors} onChange={(e) => setAuthors(e.target.value)} className="form-input" />
-          </label>
-          <label className="form-label">Select a PDF to Upload:
-            <input type="file" accept="application/pdf" onChange={handleFileChange} className="file-input" />
-          </label>
-          <button type="submit" disabled={uploading} className="upload-button">{uploading ? "Uploading..." : "Upload PDF"}</button>
+          {file && (
+            <div className="mt-4 p-4 bg-gray-800 rounded-lg">
+              <h2 className="text-lg font-semibold text-white">File Preview:</h2>
+              <p className="text-gray-400">Name: {file.name}</p>
+              <p className="text-gray-400">Size: {(file.size / 1024 / 1024).toFixed(2)} MB</p>
+              <iframe
+                title="PDF Preview"
+                src={URL.createObjectURL(file)}
+                className="mt-2 w-full h-64 border rounded"
+              ></iframe>
+            </div>
+          )}
+          <button type="submit" disabled={uploading} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full mt-4 disabled:opacity-50">
+            {uploading ? "Uploading..." : "Upload PDF"}
+          </button>
         </form>
-        {error && <p className="error-message">{error}</p>}
-      </div>
-      <div className="papers-container">
-        <h2 className="papers-title">Uploaded Papers</h2>
-        {papers.length === 0 ? <p className="no-papers-text">No papers uploaded yet.</p> : (
-          <ul className="papers-list">
-            {papers.map((paper) => (
-              <li key={paper.id} className="paper-item">
-                <div>
-                  <p className="paper-title">{paper.title}</p>
-                  <p className="paper-authors">{paper.authors}</p>
-                  <a href={paper.url} target="_blank" rel="noopener noreferrer" className="paper-link">View Paper</a>
-                </div>
-                <button onClick={() => handleDelete(paper.id)} className="delete-button">Delete</button>
-              </li>
-            ))}
-          </ul>
-        )}
+        {error && <p className="error-message text-red-500 mt-4">{error}</p>}
+
+        <div className="papers-container mt-8">
+          <h2 className="papers-title text-2xl font-bold text-gray-800">Uploaded Papers</h2>
+          {papers.length === 0 ? (
+            <p className="no-papers-text text-gray-600">No papers uploaded yet.</p>
+          ) : (
+            <table className="w-full bg-white shadow-md rounded mt-4">
+              <thead>
+                <tr>
+                  <th onClick={() => handleSort("title")} className="cursor-pointer">Title</th>
+                  <th onClick={() => handleSort("size")} className="cursor-pointer">Size (bytes)</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {papers.map((paper) => (
+                  <tr key={paper.id}>
+                    <td><a href={paper.url} target="_blank" className="text-blue-500 hover:underline">{paper.title}</a></td>
+                    <td>{paper.size}</td>
+                    <td><button onClick={() => handleDelete(paper.id)} className="bg-red-500 text-white py-1 px-3 rounded">Delete</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
     </div>
   );
