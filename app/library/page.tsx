@@ -9,6 +9,11 @@ export default function LibraryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [papers, setPapers] = useState<{ id: string; title: string; authors: string; url: string }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isClient, setIsClient] = useState(false); 
+
+  useEffect(() => {
+    setIsClient(true); 
+  }, []);
 
   useEffect(() => {
     async function fetchPapers() {
@@ -30,7 +35,8 @@ export default function LibraryPage() {
       (paper.title?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
       (paper.authors?.toLowerCase() || "").includes(searchQuery.toLowerCase())
   );
-  
+
+  if (!isClient) return null; 
 
   return (
     <div className="container mx-auto p-6 text-white">
