@@ -61,34 +61,32 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="login-container">
       <form 
         onSubmit={handleLogin} 
-        className="p-6 bg-white shadow-md rounded-md w-80"
+        className="login-form"
         aria-labelledby="login-form"
       >
-        <h2 id="login-form" className="text-lg font-semibold mb-4 text-center">
-          {isAdmin ? "Admin Login" : "Student Login"}
-        </h2>
+        <h2 id="login-form">{isAdmin ? "Admin Login" : "Student Login"}</h2>
 
         {error && (
-          <p className="text-red-500 mb-4" role="alert" aria-live="assertive">
+          <p className="error-message" role="alert" aria-live="assertive">
             {error}
           </p>
         )}
 
-        <div className="mb-4">
+        <div className="button-container">
           <button 
             type="button" 
             onClick={() => setIsAdmin(false)}
-            className={`w-1/2 p-2 rounded-l ${!isAdmin ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`inactive ${!isAdmin ? 'active' : ''}`}
           >
             Student
           </button>
           <button 
             type="button" 
             onClick={() => setIsAdmin(true)}
-            className={`w-1/2 p-2 rounded-r ${isAdmin ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`inactive ${isAdmin ? 'active' : ''}`}
           >
             Admin
           </button>
