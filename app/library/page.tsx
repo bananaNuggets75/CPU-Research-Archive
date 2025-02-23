@@ -27,9 +27,10 @@ export default function LibraryPage() {
 
   const filteredPapers = papers.filter(
     (paper) =>
-      paper.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      paper.authors.toLowerCase().includes(searchQuery.toLowerCase())
+      (paper.title?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+      (paper.authors?.toLowerCase() || "").includes(searchQuery.toLowerCase())
   );
+  
 
   return (
     <div className="container mx-auto p-6 text-white">
