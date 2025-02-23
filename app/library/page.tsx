@@ -4,12 +4,20 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import app from "@/lib/firebase";
+import { Suspense } from "react";
 
-export default function LibraryPage() {
+export default function LibraryPageWrapper() {
+  return (
+    <Suspense fallback={<p className="text-center text-gray-400">Loading...</p>}>
+      <LibraryPage />
+    </Suspense>
+  );
+}
+
+function LibraryPage() {
   const db = getFirestore(app);
   const searchParams = useSearchParams();
-  const category = searchParams.get("category") || "All"; // Default to "All" if no category is selected
-
+  const category = searchParams.get("category") || "All"; 
   const [searchQuery, setSearchQuery] = useState("");
   const [papers, setPapers] = useState<{ id: string; title: string; authors: string; category: string; url: string }[]>([]);
   const [loading, setLoading] = useState(true);
