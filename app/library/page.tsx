@@ -1,26 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import app from "@/lib/firebase";
 
 export default function LibraryPage() {
   const db = getFirestore(app);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [papers, setPapers] = useState<{ id: string; title: string; authors: string; url: string }[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isClient, setIsClient] = useState(false); 
+  const searchParams = useSearchParams();
+  const category = searchParams.get("category") || "All"; // Default to "All" if no category is selected
 
-  useEffect(() => {
-    setIsClient(true); 
-  }, []);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [papers, setPapers] = useState<{ id: string; title: string; authors: string; category: string; url: string }[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchPapers() {
       try {
         const querySnapshot = await getDocs(collection(db, "papers"));
         const papersList = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setPapers(papersList as { id: string; title: string; authors: string; url: string }[]);
+        setPapers(papersList as { id: string; title: string; authors: string; category: string; url: string }[]);
       } catch (error) {
         console.error("Error fetching papers:", error);
       } finally {
@@ -30,23 +29,23 @@ export default function LibraryPage() {
     fetchPapers();
   }, [db]);
 
+  // Filter papers based on the selected category and search query
   const filteredPapers = papers.filter(
     (paper) =>
-      (paper.title?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-      (paper.authors?.toLowerCase() || "").includes(searchQuery.toLowerCase())
+      (category === "All" || paper.category === category) &&
+      ((paper.title?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+      (paper.authors?.toLowerCase() || "").includes(searchQuery.toLowerCase()))
   );
-
-  if (!isClient) return null; 
 
   return (
     <div className="container mx-auto p-6 text-white">
-      <h1 className="text-2xl font-bold mb-4">Library</h1>
+      <h1 className="text-2xl font-bold mb-4">Library - {category}</h1>
       <input
         type="text"
         placeholder="Search papers..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full p-2 mb-4 rounded bg-gray-800 text-white border border-gray-600"
+        className="search-bar w-full p-2 mb-4 rounded bg-gray-800 text-white border border-gray-600"
       />
       {loading ? (
         <p className="text-center text-gray-400">Loading papers...</p>
