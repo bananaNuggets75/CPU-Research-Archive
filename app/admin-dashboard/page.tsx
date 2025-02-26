@@ -132,9 +132,6 @@ const AdminDashboard = () => {
       <div className="admin-container max-w-7xl mx-auto p-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="admin-title text-2xl font-bold text-gray-800">Welcome, {adminEmail}</h1>
-          <button onClick={() => signOut(auth).then(() => router.push("/login"))} className="logout-button bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-            Logout
-          </button>
         </div>
 
         <form onSubmit={handleUpload} className="upload-form bg-white p-6 rounded-lg shadow">
