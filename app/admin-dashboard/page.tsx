@@ -129,10 +129,10 @@ const AdminDashboard = () => {
   if (loading) return <p className="loading-text">Loading...</p>;
 
   return (
-    <div className="admin-dashboard bg-gray-400 min-h-screen">
+    <div className="admin-dashboard bg-dark min-h-screen">
       <div className="admin-container w-full max-w-6xl mx-auto p-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="admin-title text-2xl font-bold text-gray-800">Welcome, {adminEmail}</h1>
+          <h1 className="admin-title text-2xl font-bold text-white">Welcome, {adminEmail}</h1>
         </div>
 
         <form onSubmit={handleUpload} className="upload-form bg-gray-800 p-6 rounded-lg shadow text-white">
@@ -159,7 +159,7 @@ const AdminDashboard = () => {
         {error && <p className="error-message text-red-500 mt-4">{error}</p>}
 
         <div className="papers-container mt-8 w-full max-w-5xl mx-auto">
-          <h2 className="papers-title text-2xl font-bold text-gray-800">Uploaded Papers</h2>
+          <h2 className="papers-title text-2xl font-bold text-white">Uploaded Papers</h2>
           {papers.length === 0 ? (
             <p className="no-papers-text text-gray-600">No papers uploaded yet.</p>
           ) : (

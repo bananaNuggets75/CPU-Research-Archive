@@ -8,7 +8,7 @@ const researchTopics = [
     id: 1, 
     title: "Neural Networks", 
     image: "/cat5.jpg", 
-    designer: "David Borg",
+    designer: "Mark Burg",
     papers: 8,
     views: 35,
     ranking: 1
@@ -17,7 +17,7 @@ const researchTopics = [
     id: 2, 
     title: "Quantum Computing", 
     image: "/cat4.jpg", 
-    designer: "Lucy",
+    designer: "Elon Mars",
     papers: 7,
     views: 28,
     ranking: 2
@@ -26,7 +26,7 @@ const researchTopics = [
     id: 3, 
     title: "AI Ethics", 
     image: "/cat3.jpg", 
-    designer: "Jerry Cool West",
+    designer: "Sam Ctrlman",
     papers: 6,
     views: 23,
     ranking: 3
@@ -35,7 +35,7 @@ const researchTopics = [
     id: 4, 
     title: "Cybersecurity", 
     image: "/cat2.jpg", 
-    designer: "Bold",
+    designer: "Ryan Montgeormetry",
     papers: 4,
     views: 18,
     ranking: 4
@@ -44,7 +44,16 @@ const researchTopics = [
     id: 5, 
     title: "Blockchain Technology", 
     image: "/cat1.jpg", 
-    designer: "David Borg",
+    designer: "Stuart Barber",
+    papers: 2,
+    views: 15,
+    ranking: 5
+  },
+  { 
+    id: 6, 
+    title: "Machine Learning", 
+    image: "/cat1.jpg", 
+    designer: "Arthur Pencilgon",
     papers: 2,
     views: 15,
     ranking: 5
