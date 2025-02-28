@@ -53,38 +53,43 @@ const researchTopics = [
 
 export default function Dashboard() {
   return (
-    <div className="dashboard-container mx-auto p-6 text-white bg-gradient-to-r from-indigo-900 via-purple-900 to-black">
-      <h1 className="text-3xl font-bold mb-4 text-center">Welcome to CPU Research Archive</h1>
-      <p className="text-gray-400 mb-6 text-center">Browse research papers. Sign in for full access.</p>
+    <div className="mx-auto p-6 text-white bg-gradient-to-r bg-dark to-black min-h-screen">
+      <h1 className="text-4xl font-bold mb-6 text-center">Welcome to CPU Research Archive</h1>
+      <p className="text-lg text-gray-300 mb-8 text-center">Browse research papers. Sign in for full access.</p>
+  
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {researchTopics.map((topic) => (
           <Link key={topic.id} href={{ pathname: "/library", query: { category: topic.title } }}>
-            <div className="card"> 
-              <div className="card-image-container">
+            <div className="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col h-full">
+              
+              {/* Image Container */}
+              <div className="relative w-full h-48">
                 <Image
                   src={topic.image}
                   alt={topic.title}
                   fill
-                  className="card-image"
-                  sizes="100vw"
+                  className="object-cover"
                 />
-                <div className="card-image-overlay"></div>
               </div>
-              <div className="card-content">
-                <h3 className="card-title">{topic.title}</h3>
-                <div className="card-meta">
-                  <span>By {topic.designer}</span>
-                  <span>#{topic.ranking}</span>
-                </div>
-                <div className="card-stats">
+  
+              {/* Card Content */}
+              <div className="flex-grow flex flex-col justify-between p-4">
+                <h3 className="text-lg font-bold text-gray-900">{topic.title}</h3>
+                <p className="text-sm text-gray-700">
+                  By <span className="font-semibold">{topic.designer}</span>
+                  <span className="ml-3 font-semibold text-gray-600">#{topic.ranking}</span>
+                </p>
+                <div className="flex justify-between text-sm font-medium text-gray-800">
                   <span>{topic.papers} Papers</span>
                   <span>{topic.views} Views</span>
                 </div>
               </div>
+  
             </div>
           </Link>
         ))}
       </div>
     </div>
   );
-}
+  
+}  

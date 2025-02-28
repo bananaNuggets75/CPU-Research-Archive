@@ -6,6 +6,7 @@ import { getAuth, signOut, User } from "firebase/auth";
 import { getFirestore, doc, getDoc, collection, getDocs, deleteDoc, setDoc } from "firebase/firestore";
 import app from "@/lib/firebase";
 
+
 const AdminDashboard = () => {
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -128,14 +129,14 @@ const AdminDashboard = () => {
   if (loading) return <p className="loading-text">Loading...</p>;
 
   return (
-    <div className="admin-dashboard bg-gray-100 min-h-screen">
-      <div className="admin-container max-w-7xl mx-auto p-8">
+    <div className="admin-dashboard bg-gray-400 min-h-screen">
+      <div className="admin-container w-full max-w-6xl mx-auto p-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="admin-title text-2xl font-bold text-gray-800">Welcome, {adminEmail}</h1>
         </div>
 
-        <form onSubmit={handleUpload} className="upload-form bg-white p-6 rounded-lg shadow">
-          <label className="form-label block text-gray-700 font-bold mb-2">
+        <form onSubmit={handleUpload} className="upload-form bg-gray-800 p-6 rounded-lg shadow text-white">
+          <label className="form-label block text-gray-400 font-bold mb-2">
             Select a PDF to Upload:
             <input type="file" accept="application/pdf" onChange={handleFileChange} className="file-input w-full" />
           </label>
@@ -157,17 +158,18 @@ const AdminDashboard = () => {
         </form>
         {error && <p className="error-message text-red-500 mt-4">{error}</p>}
 
-        <div className="papers-container mt-8">
+        <div className="papers-container mt-8 w-full max-w-5xl mx-auto">
           <h2 className="papers-title text-2xl font-bold text-gray-800">Uploaded Papers</h2>
           {papers.length === 0 ? (
             <p className="no-papers-text text-gray-600">No papers uploaded yet.</p>
           ) : (
-            <table className="w-full bg-white shadow-md rounded mt-4">
+            <div className="table-container w-full overflow-x-auto">
+            <table className="paper-table w-full bg-gray-800 shadow-md rounded mt-4 text-white">
               <thead>
                 <tr>
-                  <th onClick={() => handleSort("title")} className="cursor-pointer">Title</th>
-                  <th onClick={() => handleSort("size")} className="cursor-pointer">Size (bytes)</th>
-                  <th>Actions</th>
+                  <th onClick={() => handleSort("title")} className="cursor-pointer w-1/2 text-left px-4 py-2">Title</th>
+                  <th onClick={() => handleSort("size")} className="cursor-pointer w-1/2 text-left px-4 py-2">Size (bytes)</th>
+                  <th className="cursor-pointer w-1/2 text-left px-4 py-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -180,6 +182,7 @@ const AdminDashboard = () => {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>

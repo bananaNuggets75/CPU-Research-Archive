@@ -11,6 +11,7 @@ export default function RootLayout({
       <body className="min-h-screen">
         <Navbar />
         <div className="flex justify-center items-center p-24">{children}</div>
+        <script src="https://cdn.tailwindcss.com"></script>
       </body>
     </html>
   );
